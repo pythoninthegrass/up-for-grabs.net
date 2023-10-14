@@ -1,0 +1,12 @@
+name: python_template
+desc: Python template repo that covers a lot of ground for various tasks that can be accomplished with the snek language
+site: https://example.org/your-project-link-here
+tags:
+  - python
+  - linux
+  - docker
+  - fastapi
+  - terraform
+upforgrabs:
+  name: up for grabs
+  link: https://github.com/pythoninthegrass/python_template/labels/up-for-grabs
