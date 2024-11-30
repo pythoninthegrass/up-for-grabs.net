@@ -3,8 +3,8 @@ name: Update project stats (scheduled)
 on:
   workflow_dispatch: 
   schedule:
-    # runs at 1300 daily
-    - cron: '0 13 * * *'
+    # runs at 1300 Monday/Wednesday/Friday
+    - cron: '0 13 * * 1,3,5'
 
 jobs:
   update:
@@ -53,16 +53,19 @@ jobs:
           echo 'HEAD=$(git rev-parse HEAD)' >> "$GITHUB_OUTPUT"
 
       - name: Validate all changed projects
-        run: bundle exec ruby scripts/review_changes.rb
+        id: validate
+        run: |
+          MESSAGE=$(bundle exec ruby scripts/review_changes.rb)
+          echo 'EXIT_CODE=$?' >> "$GITHUB_OUTPUT"
+          echo $MESSAGE
         if: ${{ steps.git_commit.outputs.CHANGES }}
         env:
           BASE_SHA: ${{ steps.git_commit.outputs.BASE }}
           HEAD_SHA: ${{ steps.git_commit.outputs.HEAD }}
           GITHUB_TOKEN: ${{ secrets.SHIFTBOT_TOKEN }}
 
-      # TODO: git push
       - name: Push the changes to the default branch (if any)
-        if: ${{ steps.git_commit.outputs.CHANGES }}
+        if: ${{ steps.git_commit.outputs.CHANGES && steps.validate.outputs.EXIT_CODE == 0 }}
         id: git_push
         run: |
           echo "TODO: push changes to default branch"
